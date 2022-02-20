@@ -1,0 +1,31 @@
+version: "3"
+services:
+  nodeapp:
+    container_name: dd-node-app
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "8081:8081"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    networks:
+      - node-dd
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.4.6
+    volumes:
+      #- ./mongo:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongologs:/var/log/mongodb/
+    ports:
+      - "27017:27017"
+    networks:
+      - node-dd
+networks:
+  node-dd:
+    driver: bridge
